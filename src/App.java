@@ -10,8 +10,8 @@ public class App extends JFrame
 	
 	public void InitUI()
 	{
-		add(new Images("res/SCShmup_texture_1.png", 20, 100, 100));
-		add(new Images("res/SCShmup_texture_2.png", 50, 0, 0));			// 2 Pictures getting rendered
+		int xywh[] = {0,0,450,700};
+		add(new Images("res/SCShmup_texture_1.png", 140, 0, 0, 0, xywh));	// Test Rendering
 		
         setSize(550, 800);
 
