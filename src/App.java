@@ -10,8 +10,8 @@ public class App extends JFrame
 	
 	public void InitUI()
 	{
-		add(new Images("res/SCShmup_texture_1.png"));	// Test Pictures
-		add(new Images("res/SCShmup_texture_2.png"));
+		add(new Images("res/SCShmup_texture_1.png", 20, 100, 100));
+		add(new Images("res/SCShmup_texture_2.png", 50, 0, 0));			// 2 Pictures getting rendered
 		
         setSize(550, 800);
 
@@ -28,5 +28,4 @@ public class App extends JFrame
 			a.setVisible(true);
 		});
 	}
-
 }

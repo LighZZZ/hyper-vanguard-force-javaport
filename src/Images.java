@@ -8,41 +8,44 @@ import java.awt.MediaTracker;
 import java.awt.image.ReplicateScaleFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.FilteredImageSource;
+import java.util.*;
 
 public class Images extends JPanel
 {
-	private Image img;
-	private Image resizedimg;
+	static int arrpos = 0;
+	static ArrayList<Image> imgs = new ArrayList<>();
+	static ArrayList<Image> resizedimgs = new ArrayList<>();
+	static ArrayList<Integer> x = new ArrayList<>();
+	static ArrayList<Integer> y = new ArrayList<>();
 	
-    public Images(String imgpath)
+    public Images(String imgpath, int sizepercentage, int pos_x, int pos_y)
     {
-        InitPicture(imgpath);
+    	arrpos = x.size();
+    	InitPicture(imgpath, sizepercentage);
+        x.add(pos_x);
+        y.add(pos_y);
     }
     
-    public void InitPicture(String imgpath) 
-    {
+    public void InitPicture(String imgpath, int sizepercentage) 
+    {	
     	LoadPicture(imgpath);
-    	ResizePicture();
+    	ResizePicture(sizepercentage);
         
-        int w = resizedimg.getWidth(this);
-        int h = resizedimg.getHeight(this);
-        setPreferredSize(new Dimension(w, h));        
+        int w = resizedimgs.get(arrpos).getWidth(this);
+        int h = resizedimgs.get(arrpos).getHeight(this);
+        setPreferredSize(new Dimension(w, h));    
     }
     
-    private void ResizePicture()	//https://www.rgagnon.com/javadetails/java-0243.html
+    private void ResizePicture(int sizepercentage)	//https://www.rgagnon.com/javadetails/java-0243.html
     {
     	MediaTracker media = new MediaTracker(this);
-    	media.addImage(img, 0);
+    	media.addImage(imgs.get(arrpos), 0);
         try {
             media.waitForID(0);
-            // scale down, half the original size  
-            ImageFilter replicate = 
-            	new ReplicateScaleFilter
-                 (img.getWidth(this)/2, img.getHeight(this)/2);
-            ImageProducer prod = 
-               new FilteredImageSource(img.getSource(),replicate);
-            resizedimg = createImage(prod);
-            media.addImage(resizedimg,1);
+            ImageFilter replicate = new ReplicateScaleFilter((imgs.get(arrpos).getWidth(this)/100)*sizepercentage, (imgs.get(arrpos).getHeight(this)/100)*sizepercentage);
+            ImageProducer prod =  new FilteredImageSource(imgs.get(arrpos).getSource(),replicate);
+            resizedimgs.add(createImage(prod));
+            media.addImage(resizedimgs.get(arrpos),1);
             media.waitForID(1);
         } 
         catch(InterruptedException e) {}
@@ -51,11 +54,14 @@ public class Images extends JPanel
 	private void LoadPicture(String imgpath)
 	{
 		ImageIcon ii = new ImageIcon(imgpath);
-		img = ii.getImage();
+		imgs.add(ii.getImage());
 	}
 	
-    public void paintComponent(Graphics g) 
+    public void paintComponent(Graphics g)
     {
-        g.drawImage(resizedimg, 0, 0, null);
+    	for (int i = 0; i < resizedimgs.size(); i++)
+    	{
+    		g.drawImage(resizedimgs.get(i), x.get(i), y.get(i), null);
+    	}
     }
 }
