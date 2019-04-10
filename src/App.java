@@ -1,4 +1,5 @@
 import java.awt.EventQueue;
+
 import javax.swing.JFrame;
 
 public class App extends JFrame
@@ -9,9 +10,14 @@ public class App extends JFrame
 	}
 	
 	public void InitUI()
-	{
-		int xywh[] = {0,0,450,700};
-		add(new Images("res/SCShmup_texture_1.png", 140, 0, 0, 0, xywh));	// Test Rendering
+	{	
+		// Image Panel
+		add(new Images());
+		
+		// Game Thread
+		game g = new game();
+		Thread thr = new Thread(g);
+		thr.start();
 		
         setSize(550, 800);
 

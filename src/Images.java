@@ -13,33 +13,41 @@ import java.awt.image.ReplicateScaleFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
+import sun.awt.image.ToolkitImage;
 import java.util.*;
 
 public class Images extends JPanel
 {
 	static int arrpos = 0;
-	static ArrayList<Image> imgs = new ArrayList<>();
-	static ArrayList<Image> resizedimgs = new ArrayList<>();
-	static ArrayList<Integer> x = new ArrayList<>();
-	static ArrayList<Integer> y = new ArrayList<>();
+	static ArrayList<Image> imgs = new ArrayList<Image>();
+	static ArrayList<Image> resizedimgs = new ArrayList<Image>();
+	static ArrayList<Integer> x = new ArrayList<Integer>();
+	static ArrayList<Integer> y = new ArrayList<Integer>();
 	
 	////////////////////////////////////////////////////////////////
 	//////////// Publicly accessable functions /////////////////////
 	////////////////////////////////////////////////////////////////
 	
-    public Images(String imgpath, int sizepercentage, int pos_x, int pos_y, double r_angle, int xywh[])
+    public Images() {}
+
+	public static void RenderImg(String imgpath, int sizepercentage, int pos_x, int pos_y, double r_angle, int xywh[])
     {
-    	arrpos = x.size();
-    	InitPicture(imgpath, sizepercentage, r_angle, xywh);
+		final Images img = new Images();
+		
+		arrpos = x.size();
+    	img.InitPicture(imgpath, sizepercentage, r_angle, xywh);
         x.add(pos_x);
         y.add(pos_y);
+        
+        img.RerenderImages();
     }
     
-    public void ChangeImagePosition(int idx, int x_pos, int y_pos)
+    public static void ChangeImagePosition(int idx, int x_pos, int y_pos)
     {
+    	final Images img = new Images();
     	x.set(idx, x_pos);
     	y.set(idx, y_pos);
-    	repaint();
+    	img.RerenderImages();
     }
     
 	////////////////////////////////////////////////////////////////
@@ -55,12 +63,16 @@ public class Images extends JPanel
     
     private void ResizePicture(int sizepercentage)	//https://www.rgagnon.com/javadetails/java-0243.html
     {
+    	Image img = imgs.get(arrpos);
+    	double imgwidth_db = ((double)(img.getWidth(this)) / 100)*sizepercentage;
+    	double imgheight_db = ((double)(img.getHeight(this)) / 100)*sizepercentage;
+    	
     	MediaTracker media = new MediaTracker(this);
-    	media.addImage(imgs.get(arrpos), 0);
+    	media.addImage(img, 0);
         try {
             media.waitForID(0);
-            ImageFilter replicate = new ReplicateScaleFilter((imgs.get(arrpos).getWidth(this)/100)*sizepercentage, (imgs.get(arrpos).getHeight(this)/100)*sizepercentage);
-            ImageProducer prod =  new FilteredImageSource(imgs.get(arrpos).getSource(),replicate);
+            ImageFilter replicate = new ReplicateScaleFilter((int)(Math.round(imgwidth_db)), (int)(Math.round(imgheight_db)));
+            ImageProducer prod =  new FilteredImageSource(img.getSource(),replicate);
             resizedimgs.add(createImage(prod));
             media.addImage(resizedimgs.get(arrpos),1);
             media.waitForID(1);
@@ -110,28 +122,21 @@ public class Images extends JPanel
     
     private static BufferedImage toBufferedImage(Image img)	//https://stackoverflow.com/questions/13605248/java-converting-image-to-bufferedimage
     {
-        if (img instanceof BufferedImage)
-        {
-            return (BufferedImage) img;
-        }
-
-        // Create a buffered image with transparency
-        BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-        // Draw the image on to the buffered image
-        Graphics2D bGr = bimage.createGraphics();
-        bGr.drawImage(img, 0, 0, null);
-        bGr.dispose();
-
-        // Return the buffered image
-        return bimage;
+    	BufferedImage bufimg = ((ToolkitImage)img).getBufferedImage();
+    	return bufimg;
     }
     
-    private static GraphicsConfiguration getDefaultConfiguration() {
+    private static GraphicsConfiguration getDefaultConfiguration() //https://stackoverflow.com/questions/4156518/rotate-an-image-in-java
+    {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
         return gd.getDefaultConfiguration();
     }
+    
+	private void RerenderImages()
+	{
+		repaint();
+	}
     
     @Override	
     public void paintComponent(Graphics g)
