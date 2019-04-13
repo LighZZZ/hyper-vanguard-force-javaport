@@ -1,3 +1,4 @@
+
 public class myship extends gameobject
 {
 	public myship(int x, int y, double r_angle) 
@@ -9,6 +10,6 @@ public class myship extends gameobject
 	private void Init(double r_angle)
 	{
 		int xywh_spaceship[] = {943, 0, 60, 60};
-		img = Images.GetImage("res/SCShmup_texture_3.png", 140, 0, xywh_spaceship);
+		img = Images.GetImage("res/SCShmup_texture_3.png", 140, r_angle, xywh_spaceship);
 	}
 }

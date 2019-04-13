@@ -11,22 +11,22 @@ public class App extends JFrame
 	}
 	
 	public void InitUI()
-	{	
-		// Image Panel
-		Images imgs = new Images();
-		imgs.setBorder(new EmptyBorder(5, 5, 5, 5));
-		imgs.setVisible(true);
-		add(imgs);
+	{
+		//Input Thread
+		input inp = new input();
+		Thread thr2 = new Thread(inp);
+		setLayout(new BorderLayout());
+		add(inp, BorderLayout.CENTER);
+		thr2.start();
 		
-		// Game thread
+		//Game Thread
 		game g = new game();
 		Thread thr = new Thread(g);
-		thr.start();
 		setLayout(new BorderLayout());
 		add(g, BorderLayout.CENTER);
+		thr.start();
 		
         setSize(550, 800);
-
         setTitle("Hyper Vanguard Force");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
