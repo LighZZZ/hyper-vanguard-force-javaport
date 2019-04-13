@@ -2,8 +2,10 @@ import java.awt.Image;
 
 public class gameobject extends game 
 {
-	private int pos_x = 0;
-	private int pos_y = 0;
+	protected int pos_x = 0;
+	protected int pos_y = 0;
+	protected int layer = 0;
+	protected int go_class = 0;
 	protected Image img = null;
 	
 	public gameobject(int x, int y, double r_angle)
@@ -11,7 +13,6 @@ public class gameobject extends game
 		pos_x = x;
 		pos_y = y;
 		Init(r_angle);
-		System.out.println(this + " has been created with " + x + "|" + y + " and angle " + r_angle);
 	}
 	
 	private void Init(double r_angle)

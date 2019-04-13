@@ -1,16 +1,21 @@
 import java.awt.MouseInfo;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.JPanel;
 
-public class input extends JPanel implements Runnable
+public class input extends JPanel implements Runnable, MouseListener
 {
 	private static java.awt.Point myshippos_old = new java.awt.Point(250, 600);
 	private static java.awt.Point myshippos = new java.awt.Point(250, 600);
+	private static boolean mouse1_pressed = false;
 	
-	public input() {}
+	public input() 
+	{
+		addMouseListener(this);
+	}
 	
 	public void run()
 	{
-	
 		while (true)
 		{
 			myshippos = CalcShipPos();
@@ -80,4 +85,30 @@ public class input extends JPanel implements Runnable
 	{
 		return myshippos;
 	}
+	
+	public boolean GetMousePressed()
+	{
+		return mouse1_pressed;
+	}
+	
+	@Override
+	public void mousePressed(MouseEvent arg0) 
+	{
+		mouse1_pressed = true;
+	}
+	
+	@Override
+	public void mouseReleased(MouseEvent arg0) 
+	{
+		mouse1_pressed = false;
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {}
 }

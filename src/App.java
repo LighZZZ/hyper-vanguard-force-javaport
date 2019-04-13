@@ -1,7 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
-import javax.swing.border.EmptyBorder;
 
 public class App extends JFrame
 {
@@ -22,6 +21,7 @@ public class App extends JFrame
 		//Game Thread
 		game g = new game();
 		Thread thr = new Thread(g);
+		g.addMouseListener(inp);
 		setLayout(new BorderLayout());
 		add(g, BorderLayout.CENTER);
 		thr.start();

@@ -5,6 +5,8 @@ public class background extends gameobject
 	{
 		super(x, y, r_angle);
 		Init(r_angle);
+		layer = 0;
+		go_class = 1;
 	}
 
 	private void Init(double r_angle)
