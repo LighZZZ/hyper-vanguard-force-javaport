@@ -1,5 +1,6 @@
 import javax.swing.ImageIcon;
 import java.awt.Image;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -78,6 +79,21 @@ public class Images extends JPanel
         g.dispose();
         
         return result;
+    }
+    
+    public Image MergePictures(Image img1, Image img2, int img2_pos_x, int img2_pos_y) //https://stackoverflow.com/questions/2318020/merging-two-images
+    {
+    	// create the new image, canvas size is the max. of both image sizes
+    	int w = Math.max(img1.getWidth(this), img2.getWidth(this));
+    	int h = Math.max(img1.getHeight(this), img2.getHeight(this));
+    	BufferedImage combined = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+
+    	// paint both images, preserving the alpha channels
+    	Graphics g = combined.getGraphics();
+    	g.drawImage(img1, 0, 0, null);
+    	g.drawImage(img2, img2_pos_x, img2_pos_y, null);
+
+    	return combined;
     }
 
 	private Image LoadPicture(String imgpath, int xywh[])

@@ -1,7 +1,7 @@
+import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.SplittableRandom;
 
 import javax.swing.JPanel;
 
@@ -13,16 +13,19 @@ public class game extends JPanel implements Runnable
 	
 	public void run() 
 	{	
-		int tick = 0;
-		int lasttick = 0;
 		input inp = new input();
 		gameobjects.add(new background(0, 0, 0));
 		gameobjects.add(new myship(250, 600, 0));
 		
+		int tick = 0;
+		int lasttick = 0;
+		
 		while (true)
 		{
+			myship ms = (myship)gameobjects.get(1);
+			
 			// Code that gets executed as often as possible
-			gameobjects.get(1).move(inp.GetMyShipPos().x, inp.GetMyShipPos().y);
+			ms.move(inp.GetMyShipPos().x, inp.GetMyShipPos().y);
 			
 			// Code that gets executed x ticks per second
 			tick = GetTick(32);
@@ -31,8 +34,7 @@ public class game extends JPanel implements Runnable
 			{
 				if (inp.GetMousePressed() == true)
 				{
-					int randomspread = new SplittableRandom().nextInt(-3, 3);
-					gameobjects.add(new lasershot(inp.GetMyShipPos().x + (36 + randomspread), inp.GetMyShipPos().y, 270));
+					ms.ShootMainlaser();
 				}
 				
 				for (int i = 0; i < gameobjects.size(); i++)
@@ -106,5 +108,19 @@ public class game extends JPanel implements Runnable
 				}
 			}
 		}
+		
+		myship ms = (myship)gameobjects.get(1);
+		
+		g.drawRect(100, 720, 350, 5);							// Ship Stats Outline
+		g.drawRect(100, 726, 350, 5);
+		
+		int bluecolor = (int)((350.0 / 100.0) * ms.GetSP());
+		int greencolor = (int)((350.0 / 100.0) * ms.GetHP());
+		Color myblue = new Color(51, 51, 255);
+		Color mygreen = new Color(51, 204, 51);
+		g.setColor(myblue);
+		g.fillRect(100, 720, bluecolor, 5);						// Ship Stats Fill
+		g.setColor(mygreen);
+		g.fillRect(100, 726, greencolor, 5);
 	}
 }
