@@ -1,33 +1,19 @@
-import java.awt.MouseInfo;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.JPanel;
+import java.awt.event.MouseMotionListener;
 
-public class input extends JPanel implements Runnable, MouseListener
+public class input implements MouseListener, MouseMotionListener
 {
+	private static java.awt.Point mousepos = new java.awt.Point();
 	private static java.awt.Point myshippos_old = new java.awt.Point(250, 600);
 	private static java.awt.Point myshippos = new java.awt.Point(250, 600);
 	private static boolean mouse1_pressed = false;
 	
-	public input() 
-	{
-		addMouseListener(this);
-	}
-	
-	public void run()
-	{
-		while (true)
-		{
-			myshippos = CalcShipPos();
-			
-			game.SleepDelay(5);
-		}
-	}
+	public input() {}
 	
 	public java.awt.Point CalcShipPos()
 	{
 		int midshippos = (int)(30 * 1.4);
-		java.awt.Point mousepos = GetMousePos();
 		java.awt.Point myshippos_new = new java.awt.Point(mousepos.x - midshippos, mousepos.y - midshippos);
 		java.awt.Point shippos_downunder = new java.awt.Point(mousepos.x + midshippos, mousepos.y + midshippos);
 		
@@ -58,29 +44,6 @@ public class input extends JPanel implements Runnable, MouseListener
 		}
 	}
 	
-	public java.awt.Point GetMousePos()
-	{
-		int midshippos = (int)(30 * 1.4);
-		
-		if (isShowing() == false)
-			return new java.awt.Point(myshippos_old.x + midshippos, myshippos_old.y + midshippos);
-		
-		java.awt.Point mouse_pos = MouseInfo.getPointerInfo().getLocation(); 			//https://stackoverflow.com/questions/12396066/how-to-get-location-of-a-mouse-click-relative-to-a-swing-window
-		java.awt.Point app_startloc = getLocationOnScreen();							//https://stackoverflow.com/questions/7950726/find-the-location-position-of-jframe-in-the-window
-		java.awt.Point app_endloc = new java.awt.Point(app_startloc.x + 550, app_startloc.y + 800);
-		java.awt.Point result_pos = new java.awt.Point();
-		
-		if (mouse_pos.x > app_endloc.x || mouse_pos.x < app_startloc.x || mouse_pos.y > app_endloc.y || mouse_pos.y < app_startloc.y)
-		{
-			return new java.awt.Point(myshippos_old.x + midshippos, myshippos_old.y + midshippos);
-		}
-		else
-		{
-			result_pos = new java.awt.Point(mouse_pos.x - app_startloc.x, mouse_pos.y - app_startloc.y);
-			return result_pos;
-		}
-	}
-	
 	public java.awt.Point GetMyShipPos()
 	{
 		return myshippos;
@@ -89,6 +52,20 @@ public class input extends JPanel implements Runnable, MouseListener
 	public boolean GetMousePressed()
 	{
 		return mouse1_pressed;
+	}
+	
+	@Override
+	public void mouseMoved(MouseEvent arg0) 
+	{
+		mousepos = new java.awt.Point(arg0.getX(), arg0.getY());
+		myshippos = CalcShipPos();
+	}
+	
+	@Override
+	public void mouseDragged(MouseEvent arg0) 
+	{
+		mousepos = new java.awt.Point(arg0.getX(), arg0.getY());
+		myshippos = CalcShipPos();
 	}
 	
 	@Override
@@ -110,5 +87,5 @@ public class input extends JPanel implements Runnable, MouseListener
 	public void mouseExited(MouseEvent arg0) {}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {}
+	public void mouseClicked(MouseEvent arg0) {}
 }

@@ -11,17 +11,14 @@ public class App extends JFrame
 	
 	public void InitUI()
 	{
-		//Input Thread
+		//Input
 		input inp = new input();
-		Thread thr2 = new Thread(inp);
-		setLayout(new BorderLayout());
-		add(inp, BorderLayout.CENTER);
-		thr2.start();
 		
 		//Game Thread
 		game g = new game();
-		Thread thr = new Thread(g);
 		g.addMouseListener(inp);
+		g.addMouseMotionListener(inp);
+		Thread thr = new Thread(g);
 		setLayout(new BorderLayout());
 		add(g, BorderLayout.CENTER);
 		thr.start();

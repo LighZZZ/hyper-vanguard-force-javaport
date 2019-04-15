@@ -18,7 +18,6 @@ public class game extends JPanel implements Runnable
 		input inp = new input();
 		gameobjects.add(new background(0, 0, 0));
 		gameobjects.add(new myship(250, 600, 0));
-		gameobjects.add(new lasershot(250, 300, 270));
 		
 		while (true)
 		{
@@ -26,7 +25,7 @@ public class game extends JPanel implements Runnable
 			gameobjects.get(1).move(inp.GetMyShipPos().x, inp.GetMyShipPos().y);
 			
 			// Code that gets executed x ticks per second
-			tick = GetTick(16);
+			tick = GetTick(32);
 			
 			if (tick != lasttick)
 			{
@@ -40,7 +39,7 @@ public class game extends JPanel implements Runnable
 				{
 					if (gameobjects.get(i).go_class == 3)
 					{
-						gameobjects.get(i).move(gameobjects.get(i).GetX(), gameobjects.get(i).GetY() - 50);
+						gameobjects.get(i).move(gameobjects.get(i).GetX(), gameobjects.get(i).GetY() - 30);
 						
 						if (gameobjects.get(i).GetY() < 0)
 							gameobjects.remove(i);
@@ -49,9 +48,6 @@ public class game extends JPanel implements Runnable
 				
 				lasttick = tick;
 			}
-			
-			if (tick == 16)
-				tick = 0;
 			
 			
 			repaint();
@@ -82,10 +78,10 @@ public class game extends JPanel implements Runnable
 		int curtick = 0;
 		double curmilliseconds = 0;
 		
-		for (int i = 0; i < 16; i++)
+		for (int i = 1; i <= maxtick; i++)
 		{
 			curmilliseconds = curmilliseconds + (1000 / maxtick);
-			if ((milliseconds - curmilliseconds) < Math.round(1000 / maxtick))
+			if ((milliseconds - curmilliseconds) < (1000 / maxtick))
 			{
 				curtick = i;
 				break;
