@@ -13,9 +13,14 @@ public class input implements MouseListener, MouseMotionListener
 	
 	public java.awt.Point CalcShipPos()
 	{
-		int midshippos = (int)(30 * 1.4);
-		java.awt.Point myshippos_new = new java.awt.Point(mousepos.x - midshippos, mousepos.y - midshippos);
-		java.awt.Point shippos_downunder = new java.awt.Point(mousepos.x + midshippos, mousepos.y + midshippos);
+		int midshippos_x = (int)(30 * 1.4);
+		int midshippos_y = (int)(30 * 1.4);
+		
+		if (mouse1_pressed == true)
+			midshippos_y = 65;
+		
+		java.awt.Point myshippos_new = new java.awt.Point(mousepos.x - midshippos_x, mousepos.y - midshippos_y);
+		java.awt.Point shippos_downunder = new java.awt.Point(mousepos.x + midshippos_x, mousepos.y + midshippos_y);
 		
 		if (myshippos_new.x < 0 || shippos_downunder.x > 550)
 		{
@@ -72,12 +77,16 @@ public class input implements MouseListener, MouseMotionListener
 	public void mousePressed(MouseEvent arg0) 
 	{
 		mouse1_pressed = true;
+		mousepos = new java.awt.Point(arg0.getX(), arg0.getY());
+		myshippos = CalcShipPos();
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent arg0) 
 	{
 		mouse1_pressed = false;
+		mousepos = new java.awt.Point(arg0.getX(), arg0.getY());
+		myshippos = CalcShipPos();
 	}
 
 	@Override

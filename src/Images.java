@@ -82,15 +82,35 @@ public class Images extends JPanel
     }
     
     public Image MergePictures(Image img1, Image img2, int img2_pos_x, int img2_pos_y) //https://stackoverflow.com/questions/2318020/merging-two-images
-    {
-    	// create the new image, canvas size is the max. of both image sizes
+    {	
     	int w = Math.max(img1.getWidth(this), img2.getWidth(this));
     	int h = Math.max(img1.getHeight(this), img2.getHeight(this));
+    	
+    	if (w < img2_pos_x + img2.getWidth(this))
+    		w = img2_pos_x + img2.getWidth(this);
+    	if (h < img2_pos_y + img2.getHeight(this))
+    		h = img2_pos_y + img2.getHeight(this);
+    	
+    	int img1_x = 0;
+    	int img1_y = 0;
+    	
+    	if (img2_pos_x < 0)
+    	{
+    		img1_x = (img2_pos_x * -1);
+    		w = w + (img2_pos_x * -1);
+    		img2_pos_x = 0;
+    	}
+    	if (img2_pos_y < 0)
+    	{
+    		img1_y = (img2_pos_y * -1);
+    		h = h + (img2_pos_y * -1);
+    		img2_pos_y = 0;
+    	}
+    	
     	BufferedImage combined = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-
-    	// paint both images, preserving the alpha channels
     	Graphics g = combined.getGraphics();
-    	g.drawImage(img1, 0, 0, null);
+    	
+    	g.drawImage(img1, img1_x, img1_y, null);
     	g.drawImage(img2, img2_pos_x, img2_pos_y, null);
 
     	return combined;

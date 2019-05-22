@@ -20,11 +20,11 @@ public class game extends JPanel implements Runnable
 		int tick = 0;
 		int lasttick = 0;
 		
+		myship ms = (myship)gameobjects.get(1);
+		
 		while (true)
 		{
-			myship ms = (myship)gameobjects.get(1);
-			
-			// Code that gets executed as often as possible
+			//Code that gets executed as often as possible
 			ms.move(inp.GetMyShipPos().x, inp.GetMyShipPos().y);
 			
 			// Code that gets executed x ticks per second
@@ -32,6 +32,8 @@ public class game extends JPanel implements Runnable
 			
 			if (tick != lasttick)
 			{
+				ms.Animate(inp.GetMousePressed());
+				
 				if (inp.GetMousePressed() == true)
 				{
 					ms.ShootMainlaser();
@@ -109,18 +111,21 @@ public class game extends JPanel implements Runnable
 			}
 		}
 		
-		myship ms = (myship)gameobjects.get(1);
-		
-		g.drawRect(100, 720, 350, 5);							// Ship Stats Outline
-		g.drawRect(100, 726, 350, 5);
-		
-		int bluecolor = (int)((350.0 / 100.0) * ms.GetSP());
-		int greencolor = (int)((350.0 / 100.0) * ms.GetHP());
-		Color myblue = new Color(51, 51, 255);
-		Color mygreen = new Color(51, 204, 51);
-		g.setColor(myblue);
-		g.fillRect(100, 720, bluecolor, 5);						// Ship Stats Fill
-		g.setColor(mygreen);
-		g.fillRect(100, 726, greencolor, 5);
+		if (gameobjects.size() > 0)
+		{
+			myship ms = (myship)gameobjects.get(1);
+			
+			g.drawRect(100, 720, 350, 5);							// Ship Stats Outline
+			g.drawRect(100, 726, 350, 5);
+			
+			int bluecolor = (int)((350.0 / 100.0) * ms.GetSP());
+			int greencolor = (int)((350.0 / 100.0) * ms.GetHP());
+			Color myblue = new Color(51, 51, 255);
+			Color mygreen = new Color(51, 204, 51);
+			g.setColor(myblue);
+			g.fillRect(100, 720, bluecolor, 5);						// Ship Stats Fill
+			g.setColor(mygreen);
+			g.fillRect(100, 726, greencolor, 5);
+		}
 	}
 }
