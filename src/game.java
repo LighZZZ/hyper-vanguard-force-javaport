@@ -2,7 +2,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Calendar;
-
 import javax.swing.JPanel;
 
 public class game extends JPanel implements Runnable
@@ -23,17 +22,24 @@ public class game extends JPanel implements Runnable
 		myship ms = (myship)gameobjects.get(1);
 		
 		while (true)
-		{
-			//Code that gets executed as often as possible
-			ms.move(inp.GetMyShipPos().x, inp.GetMyShipPos().y);
+		{	
+			//Code that gets executed as often as possible (200 times per second)
+			
+			ms.Animate(inp.GetMousePressed());
+			
+			if (ms.IsShieldActivated())										// Animation 1: Shield
+				ms.move(inp.GetMyShipPos().x - 6, inp.GetMyShipPos().y);
+			else if (inp.GetMousePressed())									// Animation 2: Laserfire
+				ms.move(inp.GetMyShipPos().x, inp.GetMyShipPos().y - 26);
+			else															// Animation 3: only emissions
+				ms.move(inp.GetMyShipPos().x, inp.GetMyShipPos().y);
 			
 			// Code that gets executed x ticks per second
+			
 			tick = GetTick(32);
 			
 			if (tick != lasttick)
-			{
-				ms.Animate(inp.GetMousePressed());
-				
+			{	
 				if (inp.GetMousePressed() == true)
 				{
 					ms.ShootMainlaser();
@@ -62,6 +68,11 @@ public class game extends JPanel implements Runnable
 	public void AddObject(gameobject go)
 	{
 		gameobjects.add(go);
+	}
+	
+	public gameobject GetObject(int idx)
+	{
+		return gameobjects.get(idx);
 	}
 	
 	public static void SleepDelay(long milliseconds)

@@ -1,5 +1,6 @@
 import javax.swing.ImageIcon;
 import java.awt.Image;
+import java.awt.AlphaComposite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -33,6 +34,56 @@ public class Images extends JPanel
 		img = imgs.RotatePicture(img, r_angle);
 		
 		return img;
+    }
+	
+    public Image MergePictures(Image img1, Image img2, int img2_pos_x, int img2_pos_y) //https://stackoverflow.com/questions/2318020/merging-two-images
+    {	
+    	int w = Math.max(img1.getWidth(this), img2.getWidth(this));
+    	int h = Math.max(img1.getHeight(this), img2.getHeight(this));
+    	
+    	if (w < img2_pos_x + img2.getWidth(this))
+    		w = img2_pos_x + img2.getWidth(this);
+    	if (h < img2_pos_y + img2.getHeight(this))
+    		h = img2_pos_y + img2.getHeight(this);
+    	
+    	int img1_x = 0;
+    	int img1_y = 0;
+    	
+    	if (img2_pos_x < 0)
+    	{
+    		img1_x = (img2_pos_x * -1);
+    		w = w + (img2_pos_x * -1);
+    		img2_pos_x = 0;
+    	}
+    	if (img2_pos_y < 0)
+    	{
+    		img1_y = (img2_pos_y * -1);
+    		h = h + (img2_pos_y * -1);
+    		img2_pos_y = 0;
+    	}
+    	
+    	BufferedImage combined = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+    	Graphics g = combined.getGraphics();
+    	
+    	g.drawImage(img1, img1_x, img1_y, null);
+    	g.drawImage(img2, img2_pos_x, img2_pos_y, null);
+
+    	return combined;
+    }
+    
+    public Image SetImageTransperancy(Image img, int percentage)
+    {
+    	float alpha = 0.01f * (float)percentage;
+    	
+    	BufferedImage transperent = new BufferedImage(img.getWidth(this), img.getHeight(this), Transparency.TRANSLUCENT);
+    	Graphics g = transperent.getGraphics();
+    	Graphics2D g2d = (Graphics2D)g.create();
+    	
+    	g2d.setComposite(AlphaComposite.SrcOver.derive(alpha));
+    	g2d.drawImage(img, 0, 0, this);
+    	g2d.dispose();
+    	
+    	return transperent;
     }
     
 	////////////////////////////////////////////////////////////////
@@ -79,41 +130,6 @@ public class Images extends JPanel
         g.dispose();
         
         return result;
-    }
-    
-    public Image MergePictures(Image img1, Image img2, int img2_pos_x, int img2_pos_y) //https://stackoverflow.com/questions/2318020/merging-two-images
-    {	
-    	int w = Math.max(img1.getWidth(this), img2.getWidth(this));
-    	int h = Math.max(img1.getHeight(this), img2.getHeight(this));
-    	
-    	if (w < img2_pos_x + img2.getWidth(this))
-    		w = img2_pos_x + img2.getWidth(this);
-    	if (h < img2_pos_y + img2.getHeight(this))
-    		h = img2_pos_y + img2.getHeight(this);
-    	
-    	int img1_x = 0;
-    	int img1_y = 0;
-    	
-    	if (img2_pos_x < 0)
-    	{
-    		img1_x = (img2_pos_x * -1);
-    		w = w + (img2_pos_x * -1);
-    		img2_pos_x = 0;
-    	}
-    	if (img2_pos_y < 0)
-    	{
-    		img1_y = (img2_pos_y * -1);
-    		h = h + (img2_pos_y * -1);
-    		img2_pos_y = 0;
-    	}
-    	
-    	BufferedImage combined = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-    	Graphics g = combined.getGraphics();
-    	
-    	g.drawImage(img1, img1_x, img1_y, null);
-    	g.drawImage(img2, img2_pos_x, img2_pos_y, null);
-
-    	return combined;
     }
 
 	private Image LoadPicture(String imgpath, int xywh[])

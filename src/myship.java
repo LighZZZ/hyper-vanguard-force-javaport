@@ -5,6 +5,7 @@ public class myship extends gameobject
 {	
 	private int hp = 100;
 	private int sp = 100;
+	private boolean shieldactivated = true;
 	private Images images = new Images();
 	private game g = new game();
 	
@@ -57,11 +58,21 @@ public class myship extends gameobject
 				newimage = images.MergePictures(newimage, smallemission, 30 + randomspread_x, 94 + randomspread_y);
 		}
 		
+		shieldactivated = (!isshooting && sp > 0);
+		
 		if (isshooting)
 		{
 			int xywh_laserfire[] = {172, 630, 24, 26};
 			Image laserfire = Images.GetImage("res/SCShmup_texture_3.png", 100, 0, xywh_laserfire);
 			newimage = images.MergePictures(newimage, laserfire, 32, -26);
+		}
+		
+		if (shieldactivated)
+		{
+			int xywh_shield[] = {894, 330, 63, 63};
+			Image shield  = Images.GetImage("res/SCShmup_texture_2.png", 150, 0, xywh_shield);
+			shield = images.SetImageTransperancy(shield, 25);
+			newimage = images.MergePictures(newimage, shield, -6, 0);
 		}
 		
 		img = newimage;
@@ -81,5 +92,10 @@ public class myship extends gameobject
 	public int GetSP()
 	{
 		return sp;
+	}
+	
+	public boolean IsShieldActivated()
+	{
+		return shieldactivated;
 	}
 }

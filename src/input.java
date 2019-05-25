@@ -1,6 +1,7 @@
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.ImageObserver;
 
 public class input implements MouseListener, MouseMotionListener
 {
@@ -12,12 +13,9 @@ public class input implements MouseListener, MouseMotionListener
 	public input() {}
 	
 	public java.awt.Point CalcShipPos()
-	{
+	{	
 		int midshippos_x = (int)(30 * 1.4);
 		int midshippos_y = (int)(30 * 1.4);
-		
-		if (mouse1_pressed == true)
-			midshippos_y = 65;
 		
 		java.awt.Point myshippos_new = new java.awt.Point(mousepos.x - midshippos_x, mousepos.y - midshippos_y);
 		java.awt.Point shippos_downunder = new java.awt.Point(mousepos.x + midshippos_x, mousepos.y + midshippos_y);
