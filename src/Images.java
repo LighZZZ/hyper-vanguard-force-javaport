@@ -71,7 +71,7 @@ public class Images extends JPanel
     	return combined;
     }
     
-    public Image SetImageTransperancy(Image img, int percentage)
+    public Image SetImageTransperancy(Image img, int percentage) //https://stackoverflow.com/questions/11552092/changing-image-opacity
     {
     	float alpha = 0.01f * (float)percentage;
     	
@@ -85,6 +85,26 @@ public class Images extends JPanel
     	
     	return transperent;
     }
+    
+	public boolean isPixelTransperent(gameobject go1, int pos_x, int pos_y)
+	{
+		Image im = go1.img;
+        BufferedImage bi = new BufferedImage(im.getWidth(null),im.getHeight(null),BufferedImage.TYPE_INT_RGB);
+        Graphics bg = bi.getGraphics();
+        bg.drawImage(im, 0, 0, null);
+        bg.dispose();
+		
+		int x = pos_x - go1.GetX();
+		int y = pos_y - go1.GetY();
+		
+		int pixel = bi.getRGB(x, y);
+		int transperency = ((pixel >> 24) & 0xFF);
+		
+		if (transperency == 255)
+			return true;
+		
+		return false;
+	}
     
 	////////////////////////////////////////////////////////////////
 	//////////// Main picture functions ////////////////////////////
@@ -153,11 +173,11 @@ public class Images extends JPanel
 	//////////// Backend Functions /////////////////////////////////
 	////////////////////////////////////////////////////////////////
     
-    private static BufferedImage toBufferedImage(Image img)	//https://stackoverflow.com/questions/13605248/java-converting-image-to-bufferedimage
-    {
+	private static BufferedImage toBufferedImage(Image img) //https://stackoverflow.com/questions/13605248/java-converting-image-to-bufferedimage
+	{
     	BufferedImage bufimg = ((ToolkitImage)img).getBufferedImage();
     	return bufimg;
-    }
+	}
     
     private static GraphicsConfiguration getDefaultConfiguration() //https://stackoverflow.com/questions/4156518/rotate-an-image-in-java
     {

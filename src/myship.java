@@ -5,6 +5,7 @@ public class myship extends gameobject
 {	
 	private int hp = 100;
 	private int sp = 100;
+	private int damage = 20;
 	private boolean shieldactivated = true;
 	private Images images = new Images();
 	private game g = new game();
@@ -13,7 +14,7 @@ public class myship extends gameobject
 	{
 		super(x, y, r_angle);
 		Init(r_angle);
-		layer = 2;
+		layer = 1;
 		go_class = 2;
 	}
 
@@ -81,7 +82,10 @@ public class myship extends gameobject
 	public void ShootMainlaser()
 	{
 		int randomspread = new SplittableRandom().nextInt(-3, 3);
-		g.AddObject(new lasershot(pos_x + (36 + randomspread), pos_y, 270));
+		lasershot ls = new lasershot(pos_x + (36 + randomspread), pos_y, 270);
+		ls.SetFiredBy(0);
+		ls.SetDamage(damage);
+		g.AddObject(ls);
 	}
 	
 	public int GetHP()
@@ -92,6 +96,16 @@ public class myship extends gameobject
 	public int GetSP()
 	{
 		return sp;
+	}
+	
+	public void SetHP(int i)
+	{
+		hp = i;
+	}
+	
+	public void SetSP(int i)
+	{
+		sp = i;
 	}
 	
 	public boolean IsShieldActivated()

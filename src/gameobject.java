@@ -17,7 +17,7 @@ public class gameobject extends game
 	
 	private void Init(double r_angle)
 	{
-		System.out.println(this + " has been created with " + pos_x + "|" + pos_y + " and angle " + r_angle);
+		/*System.out.println(this + " has been created with " + pos_x + "|" + pos_y + " and angle " + r_angle);*/
 	}
 	
 	public void move(int x, int y)
