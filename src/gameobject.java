@@ -63,4 +63,19 @@ public class gameobject
 	{
 		return r_angle;
 	}
+	
+	public Image GetImage()
+	{
+		return img;
+	}
+	
+	public int GetLayer()
+	{
+		return layer;
+	}
+	
+	public int GetGOClass()
+	{
+		return go_class;
+	}
 }

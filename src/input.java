@@ -12,7 +12,7 @@ public class input implements MouseListener, MouseMotionListener, KeyListener
 	private static boolean mouse1_pressed = false;
 	private static boolean key_pressed = false;
 	
-	public input() {}
+	public input(){}
 	
 	public java.awt.Point CalcShipPos()
 	{	
@@ -115,7 +115,6 @@ public class input implements MouseListener, MouseMotionListener, KeyListener
 	@Override
 	public void mouseClicked(MouseEvent arg0) {}
 
-
 	@Override
-	public void keyTyped(KeyEvent arg0) {}
+	public void keyTyped(KeyEvent e){}
 }

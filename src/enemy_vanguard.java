@@ -15,7 +15,7 @@ public class enemy_vanguard extends enemyship
 	
 	protected void Init()
 	{
-		int xywh_spaceship[] = {790, 942, 57, 74};
+		int xywh_spaceship[] = {790, 952, 57, 64};
 		img = Images.GetImage("res/SCShmup_texture_2.png", 120, r_angle, xywh_spaceship);
 	}
 	

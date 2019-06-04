@@ -1,10 +1,10 @@
 public class gameevents 
 {
 	private static game g = new game();
-	private static boolean created = false;
-	private static int lvlstage = 0;
-	private static int starttick = 0;
-	private static int lasttickdifference = 0;
+	private boolean created = false;
+	private int lvlstage = 0;
+	private int starttick = -1;
+	private int lasttickdifference = 0;
 	
 	public void ExecuteGameEvent(int roundtick)
 	{
@@ -35,13 +35,11 @@ public class gameevents
 			case 11:
 				g.SetGamestate(3);
 		}
-		
-		System.out.println("Lvlstage: " + lvlstage);
 	}
 	
 	private void BossFight(int roundtick)
 	{
-		if (starttick == 0)
+		if (starttick == -1)
 			starttick = roundtick;
 		
 		if (!created)
@@ -55,11 +53,11 @@ public class gameevents
 		
 		for (int i = 0; i < g.GetGOList().size(); i++)
 		{	
-			if (g.GetObject(i).go_class == 4)
+			if (g.GetObject(i).GetGOClass() == 4)
 			{
 				enemyship es = (enemyship)g.GetObject(i);
 				
-				if (es.es_class == 5)
+				if (es.GetESClass() == 5)
 				{
 					spaceships++;
 					
@@ -90,14 +88,14 @@ public class gameevents
 		{
 			DeleteSpaceships(5);
 			created = false;
-			starttick = 0;
+			starttick = -1;
 			lvlstage++;
 		}
 	}
 	
  	private void VanguardCurveConstellation(int pos_x, int pos_y, int radius_x, int radius_y, int roundtick)
 	{
-		if (starttick == 0)
+		if (starttick == -1)
 			starttick = roundtick;
 		
 		if (!created)
@@ -111,11 +109,11 @@ public class gameevents
 		
 		for (int i = 0; i < g.GetGOList().size(); i++)
 		{
-			if (g.GetObject(i).go_class == 4)
+			if (g.GetObject(i).GetGOClass() == 4)
 			{
 				enemyship es = (enemyship)g.GetObject(i);
 				
-				if (es.es_class == 4)
+				if (es.GetESClass() == 4)
 				{
 					spaceships++;
 					
@@ -143,14 +141,14 @@ public class gameevents
 		{
 			DeleteSpaceships(4);
 			lvlstage++;
-			starttick = 0;
+			starttick = -1;
 			created = false;
 		}
 	}
 	
 	private void AuroraConstellation(int roundtick)
 	{
-		if (starttick == 0)
+		if (starttick == -1)
 			starttick = roundtick;
 		
 		if (!created)
@@ -164,11 +162,11 @@ public class gameevents
 		
 		for (int i = 0; i < g.GetGOList().size(); i++)
 		{	
-			if (g.GetObject(i).go_class == 4)
+			if (g.GetObject(i).GetGOClass() == 4)
 			{
 				enemyship es = (enemyship)g.GetObject(i);
 				
-				if (es.es_class == 3)
+				if (es.GetESClass() == 3)
 				{
 					spaceships++;
 					
@@ -198,16 +196,15 @@ public class gameevents
 		if (spaceships == 0)
 		{
 			DeleteSpaceships(3);
-			System.out.println(roundtick);
 			created = false;
-			starttick = 0;
+			starttick = -1;
 			lvlstage++;
 		}
 	}
 	
 	private void HeraldConstellation(int roundtick)
 	{
-		if (starttick == 0)
+		if (starttick == -1)
 			starttick = roundtick;
 		
 		if (!created)
@@ -221,11 +218,11 @@ public class gameevents
 		
 		for (int i = 0; i < g.GetGOList().size(); i++)
 		{	
-			if (g.GetObject(i).go_class == 4)
+			if (g.GetObject(i).GetGOClass() == 4)
 			{
 				enemyship es = (enemyship)g.GetObject(i);
 				
-				if (es.es_class == 2)
+				if (es.GetESClass() == 2)
 				{
 					spaceships++;
 					
@@ -271,7 +268,7 @@ public class gameevents
 					lvlstage++;
 					System.out.println(roundtick);
 					created = false;
-					starttick = 0;
+					starttick = -1;
 					break;
 				}
 			}
@@ -283,13 +280,13 @@ public class gameevents
 			lvlstage++;
 			System.out.println(roundtick);
 			created = false;
-			starttick = 0;
+			starttick = -1;
 		}
 	}
 	
 	private void MustangCurveConstellation(int pos_x, int pos_y, int radius_x, int radius_y, int roundtick)
 	{
-		if (starttick == 0)
+		if (starttick == -1)
 			starttick = roundtick;
 		
 		if (!created)
@@ -302,11 +299,11 @@ public class gameevents
 		
 		for (int i = 0; i < g.GetGOList().size(); i++)
 		{
-			if (g.GetObject(i).go_class == 4)
+			if (g.GetObject(i).GetGOClass() == 4)
 			{
 				enemyship es = (enemyship)g.GetObject(i);
 				
-				if (es.es_class == 1)
+				if (es.GetESClass() == 1)
 				{
 					spaceships++;
 					
@@ -315,7 +312,7 @@ public class gameevents
 					double x = radius_x * Math.cos(radians) + pos_x;
 					double y = radius_y * Math.sin(radians) + pos_y;
 					
-					g.GetObject(i).SetAngle(degrees -90);
+					g.GetObject(i).SetAngle(degrees - 90);
 					g.GetObject(i).move((int)x, (int)y);
 				}
 			}
@@ -325,8 +322,7 @@ public class gameevents
 		{
 			DeleteSpaceships(1);
 			lvlstage++;
-			System.out.println(roundtick);
-			starttick = 0;
+			starttick = -1;
 			created = false;
 		}
 	}
@@ -340,8 +336,8 @@ public class gameevents
 		{
 		    double degrees = (double)i + deg_add;
 		    double radians = Math.toRadians(degrees);
-			double x = 55 * Math.cos(radians) + go.GetX() + go.img.getWidth(null) / 2;
-			double y = 55 * Math.sin(radians) + go.GetY() + go.img.getHeight(null) / 2;
+			double x = 55 * Math.cos(radians) + go.GetX() + go.GetImage().getWidth(null) / 2;
+			double y = 55 * Math.sin(radians) + go.GetY() + go.GetImage().getHeight(null) / 2;
 			
 			double distance = Math.sqrt(Math.pow((double)(pos_x - x), (double)2) + Math.pow((double)(pos_y - y), (double)2));
 			
@@ -379,17 +375,13 @@ public class gameevents
 	{
 		for (int i = 0; i < g.GetGOList().size(); i++)
 		{
-			if (g.GetObject(i).go_class == 4)
+			if (g.GetObject(i).GetGOClass() == 4)
 			{
 				enemyship es = (enemyship)g.GetObject(i);
-				if (es.es_class == es_class)
+				if (es.GetESClass() == es_class)
 					g.RemoveObject(i);
 			}
 		}
 	}
-	
-	public void SetLevelStage(int i)
-	{
-		lvlstage = i;
-	}
+
 }

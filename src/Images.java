@@ -32,16 +32,6 @@ public class Images extends JPanel
 		return img;
     }
 	
-	public static Image GetImage(Image img, int sizepercentage, double r_angle, int xywh[])
-    {
-		final Images imgs = new Images();
-		
-		img = imgs.ResizePicture(img, sizepercentage);
-		img = imgs.RotatePicture(img, r_angle);
-		
-		return img;
-    }
-	
     public Image MergePictures(Image img1, Image img2, int img2_pos_x, int img2_pos_y) //https://stackoverflow.com/questions/2318020/merging-two-images
     {		
     	int w = Math.max(img1.getWidth(this), img2.getWidth(this));
@@ -92,9 +82,9 @@ public class Images extends JPanel
     	return transperent;
     }
     
-	public boolean isPixelTransperent(gameobject go1, int pos_x, int pos_y)
+	public boolean isPixelTransperent(gameobject go1, int pos_x, int pos_y)	//https://stackoverflow.com/questions/8978228/java-bufferedimage-how-to-know-if-a-pixel-is-transparent
 	{	
-		Image im = go1.img;
+		Image im = go1.GetImage();
 		
         BufferedImage bi = new BufferedImage(im.getWidth(null), im.getHeight(null), BufferedImage.TYPE_INT_RGB);
         Graphics bg = bi.getGraphics();

@@ -4,8 +4,12 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JPanel;
 
 public class game extends JPanel implements Runnable
@@ -13,8 +17,8 @@ public class game extends JPanel implements Runnable
 	private static ArrayList<gameobject> gameobjects = new ArrayList<gameobject>();	
 	private static Images images = new Images();
 	private static input inp = new input();
-	private static gameevents ge = new gameevents();
 	private static int gamestate = 0;
+	private static audiooutput music = null;
 	
 	public game() {}
 	
@@ -27,29 +31,45 @@ public class game extends JPanel implements Runnable
 				switch (gamestate)
 				{
 					case 0:
-						gameobjects.add(new background(1, 0, 0, 0)); break;
+						gameobjects.add(new background(1, 0, 0, 0));
+						PlayMusic("mainmenu");
+						break;
 					case 2:
 						gameobjects.add(new background(2, 0, 0, 0)); break;
 					case 3:
-						gameobjects.add(new background(3, 0, 0, 0)); break;
+						gameobjects.add(new background(3, 0, 0, 0));
 				}
 				
 				repaint();
 				
 				while (gamestate != 1)
 				{
-					if (inp.GetMousePressed() == true || inp.GetKeyPressed() == true)
+					if (gamestate == 0)
 					{
-						gamestate = 1;
-						ge.SetLevelStage(0);
+						if (inp.GetMousePressed() == true || inp.GetKeyPressed() == true)
+						{
+							gamestate = 1;
+						}
+					}
+					else
+					{
+						if (inp.GetKeyPressed() == true)
+						{
+							gamestate = 1;
+						}
 					}
 					
-					System.out.println("gamestate " + gamestate + " mp: " + inp.GetMousePressed() + " kp: " + inp.GetKeyPressed());
+					SleepDelay(1);
 				}
 			}
 			
 			else if (gamestate == 1)
-			{	
+			{
+				StopMusic();
+				PlayMusic("inlevel");
+				
+				gameevents ge = new gameevents();
+				
 				gameobjects.add(new background(0, 0, 0, 0));
 				gameobjects.add(new myship(250, 600, 0));
 				
@@ -114,72 +134,35 @@ public class game extends JPanel implements Runnable
 		}
 	}
 	
-	/*
-	public void run() 
-	{	
-		gameobjects.add(new background(3, 0, 0, 0));
-		gameobjects.add(new myship(250, 600, 0));
+	private void PlayMusic(String type)
+	{
+		String path = "res/" + type + ".wav";
 		
-		int tick[] = new int[2];
-		int lasttick[] = new int[2];
-		int roundtick = 0;
-		
-		myship ms = (myship)gameobjects.get(1);
-		
-		while (true)
-		{	
-			//Code that gets executed as often as possible (1000 times per second)
-			
-			ms.Animate(inp.GetMousePressed());
-			
-			if (ms.IsShieldActivated())										// Animation 1: Shield
-				ms.move(inp.GetMyShipPos().x - 6, inp.GetMyShipPos().y);
-			else if (inp.GetMousePressed())									// Animation 2: Laserfire
-				ms.move(inp.GetMyShipPos().x, inp.GetMyShipPos().y - 26);
-			else															// Animation 3: only emissions
-				ms.move(inp.GetMyShipPos().x, inp.GetMyShipPos().y);
-			
-			ge.ExecuteGameEvent(roundtick);
-			HitRegistration();
-			
-			// Code that gets executed x ticks per second
-			
-			tick[0] = GetTick(32);
-			tick[1] = GetTick(8);
-			
-			if (tick[1] != lasttick[1])
-			{
-				ShipCollision();
-				RenderExplosions();
-				
-				lasttick[1] = tick[1];
-			}
-			
-			if (tick[0] != lasttick[0])
-			{	
-				if (inp.GetMousePressed() == true)
-				{
-					ms.ShootMainlaser();
-				}
-				
-				ProcessLasershots();
-				
-				roundtick++;
-				
-				lasttick[0] = tick[0];
-			}
-			
-			repaint();
-			SleepDelay(1);
+		try 
+		{
+			music = new audiooutput(path);
+			music.Start();
+		} 
+		catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) 
+		{
+			e.printStackTrace();
 		}
 	}
-	*/
+	
+	private void StopMusic()
+	{
+		if (music != null)
+		{
+			music.Stop();
+			music = null;
+		}
+	}
 	
   	private void ProcessLasershots()
 	{
 		for (int i = 0; i < gameobjects.size(); i++)
 		{
-			if (gameobjects.get(i).go_class != 3)
+			if (gameobjects.get(i).GetGOClass() != 3)
 				continue;
 			
 			lasershot ls = (lasershot)gameobjects.get(i);
@@ -222,7 +205,7 @@ public class game extends JPanel implements Runnable
   		
   		for (int i = 0; i < gameobjects.size(); i++)
   		{
-  			if (gameobjects.get(i).go_class == 4)
+  			if (gameobjects.get(i).GetGOClass() == 4)
   			{
   				enemyship es = (enemyship)gameobjects.get(i);
   				
@@ -248,19 +231,19 @@ public class game extends JPanel implements Runnable
  	{	
  		for (int i = 0; i < gameobjects.size(); i++)
  		{
-			if (gameobjects.get(i).go_class != 3)
+			if (gameobjects.get(i).GetGOClass() != 3)
 				continue;
 			
 			lasershot ls = (lasershot)gameobjects.get(i);
  			
  			for (int j = 0; j < gameobjects.size(); j++)
  			{
-				if (gameobjects.get(j).go_class != 2 && gameobjects.get(j).go_class != 4)
+				if (gameobjects.get(j).GetGOClass() != 2 && gameobjects.get(j).GetGOClass() != 4)
 					continue;
 				
  				if (DoGOsIntersect(gameobjects.get(i), gameobjects.get(j)))
  				{					
- 					if (gameobjects.get(j).go_class == 2 && ls.GetFiredBy() == 1)
+ 					if (gameobjects.get(j).GetGOClass() == 2 && ls.GetFiredBy() == 1)
  					{
  						myship ms = (myship)gameobjects.get(j);
  						ms.ProcessDamage(15);
@@ -269,7 +252,7 @@ public class game extends JPanel implements Runnable
  						gameobjects.remove(i); break;
  					}
  							
- 					else if (gameobjects.get(j).go_class == 4 && ls.GetFiredBy() == 0)
+ 					else if (gameobjects.get(j).GetGOClass() == 4 && ls.GetFiredBy() == 0)
  					{
  						enemyship es = (enemyship)gameobjects.get(j);
  						es.SetHP(es.GetHP() - ls.GetDamage());
@@ -286,10 +269,10 @@ public class game extends JPanel implements Runnable
 	{
 		for (int i = 0; i < gameobjects.size(); i++)
 		{
-			int pos_x = gameobjects.get(i).GetX() + gameobjects.get(i).img.getWidth(this) / 2 - 20;
-			int pos_y = gameobjects.get(i).GetY() + gameobjects.get(i).img.getHeight(this) / 2 - 20;
+			int pos_x = gameobjects.get(i).GetX() + gameobjects.get(i).GetImage().getWidth(this) / 2 - 20;
+			int pos_y = gameobjects.get(i).GetY() + gameobjects.get(i).GetImage().getHeight(this) / 2 - 20;
 			
-			if (gameobjects.get(i).go_class == 2)
+			if (gameobjects.get(i).GetGOClass() == 2)
 			{
 				myship ms = (myship)gameobjects.get(i);
 				if (ms.GetHP() <= 0)
@@ -298,7 +281,7 @@ public class game extends JPanel implements Runnable
 				}
 			}
 			
-			else if (gameobjects.get(i).go_class == 4)
+			else if (gameobjects.get(i).GetGOClass() == 4)
 			{
 				enemyship es = (enemyship)gameobjects.get(i);
 				if (es.GetHP() <= 0)
@@ -314,7 +297,7 @@ public class game extends JPanel implements Runnable
 	{
 		for (int i = 0; i < gameobjects.size(); i++)
 		{
-			if (gameobjects.get(i).go_class == 5)
+			if (gameobjects.get(i).GetGOClass() == 5)
 			{
 				explosion exp = (explosion)gameobjects.get(i);
 				
@@ -328,8 +311,8 @@ public class game extends JPanel implements Runnable
 	
 	private boolean DoGOsIntersect(gameobject go1, gameobject go2)
 	{
-		Rectangle r_go1 = new Rectangle(go1.GetX(), go1.GetY(), go1.img.getWidth(this), go1.img.getHeight(this));
-		Rectangle r_go2 = new Rectangle(go2.GetX(), go2.GetY(), go2.img.getWidth(this), go2.img.getHeight(this));
+		Rectangle r_go1 = new Rectangle(go1.GetX(), go1.GetY(), go1.GetImage().getWidth(this), go1.GetImage().getHeight(this));
+		Rectangle r_go2 = new Rectangle(go2.GetX(), go2.GetY(), go2.GetImage().getWidth(this), go2.GetImage().getHeight(this));
 		
 		if (r_go1.intersects(r_go2))
 		{
@@ -426,7 +409,10 @@ public class game extends JPanel implements Runnable
 		{
 			for (int i = 0; i < gameobjects.size(); i++)
 			{
-				g.drawImage(gameobjects.get(i).img, gameobjects.get(i).GetX(), gameobjects.get(i).GetY(), null);
+				if (gameobjects.get(i).GetLayer() == i2)
+				{
+					g.drawImage(gameobjects.get(i).GetImage(), gameobjects.get(i).GetX(), gameobjects.get(i).GetY(), null);
+				}
 			}
 		}
 		

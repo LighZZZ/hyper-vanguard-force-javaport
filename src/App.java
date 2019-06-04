@@ -19,6 +19,7 @@ public class App extends JFrame
 		g.addMouseListener(inp);
 		g.addMouseMotionListener(inp);
 		g.addKeyListener(inp);
+		g.setFocusable(true);
 		Thread thr = new Thread(g);
 		setLayout(new BorderLayout());
 		add(g, BorderLayout.CENTER);

@@ -23,4 +23,9 @@ public class enemyship extends gameobject
 	{
 		hp = i;
 	}
+	
+	public int GetESClass()
+	{
+		return es_class;
+	}
 }
