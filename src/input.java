@@ -1,14 +1,16 @@
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.image.ImageObserver;
 
-public class input implements MouseListener, MouseMotionListener
+public class input implements MouseListener, MouseMotionListener, KeyListener
 {
 	private static java.awt.Point mousepos = new java.awt.Point();
 	private static java.awt.Point myshippos_old = new java.awt.Point(250, 600);
 	private static java.awt.Point myshippos = new java.awt.Point(250, 600);
 	private static boolean mouse1_pressed = false;
+	private static boolean key_pressed = false;
 	
 	public input() {}
 	
@@ -57,6 +59,11 @@ public class input implements MouseListener, MouseMotionListener
 		return mouse1_pressed;
 	}
 	
+	public boolean GetKeyPressed()
+	{
+		return key_pressed;
+	}
+	
 	@Override
 	public void mouseMoved(MouseEvent arg0) 
 	{
@@ -86,6 +93,18 @@ public class input implements MouseListener, MouseMotionListener
 		mousepos = new java.awt.Point(arg0.getX(), arg0.getY());
 		myshippos = CalcShipPos();
 	}
+	
+	@Override
+	public void keyPressed(KeyEvent arg0) 
+	{
+		key_pressed = true;
+	}
+	
+	@Override
+	public void keyReleased(KeyEvent arg0)
+	{
+		key_pressed = false;
+	}
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {}
@@ -95,4 +114,8 @@ public class input implements MouseListener, MouseMotionListener
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {}
+
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {}
 }

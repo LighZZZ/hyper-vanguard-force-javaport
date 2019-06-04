@@ -1,29 +1,130 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import javax.swing.JPanel;
 
 public class game extends JPanel implements Runnable
 {
-	private static ArrayList<gameobject> gameobjects = new ArrayList<gameobject>();
+	private static ArrayList<gameobject> gameobjects = new ArrayList<gameobject>();	
 	private static Images images = new Images();
 	private static input inp = new input();
+	private static gameevents ge = new gameevents();
+	private static int gamestate = 0;
 	
 	public game() {}
 	
+	public void run()
+	{
+		while (true)
+		{
+			if (gamestate == 0 || gamestate == 2 || gamestate == 3)
+			{
+				switch (gamestate)
+				{
+					case 0:
+						gameobjects.add(new background(1, 0, 0, 0)); break;
+					case 2:
+						gameobjects.add(new background(2, 0, 0, 0)); break;
+					case 3:
+						gameobjects.add(new background(3, 0, 0, 0)); break;
+				}
+				
+				repaint();
+				
+				while (gamestate != 1)
+				{
+					if (inp.GetMousePressed() == true || inp.GetKeyPressed() == true)
+					{
+						gamestate = 1;
+						ge.SetLevelStage(0);
+					}
+					
+					System.out.println("gamestate " + gamestate + " mp: " + inp.GetMousePressed() + " kp: " + inp.GetKeyPressed());
+				}
+			}
+			
+			else if (gamestate == 1)
+			{	
+				gameobjects.add(new background(0, 0, 0, 0));
+				gameobjects.add(new myship(250, 600, 0));
+				
+				int tick[] = new int[2];
+				int lasttick[] = new int[2];
+				int roundtick = 0;
+				
+				myship ms = (myship)gameobjects.get(1);
+				
+				while (gamestate == 1)
+				{
+					//Code that gets executed as often as possible (1000 times per second)
+					
+					if (ms.GetHP() <= 0)
+						gamestate = 2;
+					
+					ms.Animate(inp.GetMousePressed());
+					
+					if (ms.IsShieldActivated())										// Animation 1: Shield
+						ms.move(inp.GetMyShipPos().x - 6, inp.GetMyShipPos().y);
+					else if (inp.GetMousePressed())									// Animation 2: Laserfire
+						ms.move(inp.GetMyShipPos().x, inp.GetMyShipPos().y - 26);
+					else															// Animation 3: only emissions
+						ms.move(inp.GetMyShipPos().x, inp.GetMyShipPos().y);
+					
+					ge.ExecuteGameEvent(roundtick);
+					HitRegistration();
+					
+					// Code that gets executed x ticks per second
+					
+					tick[0] = GetTick(32);
+					tick[1] = GetTick(8);
+					
+					if (tick[1] != lasttick[1])
+					{
+						ShipCollision();
+						RenderExplosions();
+						
+						lasttick[1] = tick[1];
+					}
+					
+					if (tick[0] != lasttick[0])
+					{	
+						if (inp.GetMousePressed() == true)
+						{
+							ms.ShootMainlaser();
+						}
+						
+						ProcessLasershots();
+						
+						roundtick++;
+						
+						lasttick[0] = tick[0];
+					}
+					
+					repaint();
+					SleepDelay(1);
+				}
+			}
+			
+			gameobjects.clear();
+		}
+	}
+	
+	/*
 	public void run() 
 	{	
-		gameobjects.add(new background(0, 0, 0));
+		gameobjects.add(new background(3, 0, 0, 0));
 		gameobjects.add(new myship(250, 600, 0));
 		
 		int tick[] = new int[2];
 		int lasttick[] = new int[2];
+		int roundtick = 0;
 		
 		myship ms = (myship)gameobjects.get(1);
-		
-		gameobjects.add(new enemy_mustang(250, 300, 90));
 		
 		while (true)
 		{	
@@ -38,6 +139,8 @@ public class game extends JPanel implements Runnable
 			else															// Animation 3: only emissions
 				ms.move(inp.GetMyShipPos().x, inp.GetMyShipPos().y);
 			
+			ge.ExecuteGameEvent(roundtick);
+			HitRegistration();
 			
 			// Code that gets executed x ticks per second
 			
@@ -45,7 +148,8 @@ public class game extends JPanel implements Runnable
 			tick[1] = GetTick(8);
 			
 			if (tick[1] != lasttick[1])
-			{	
+			{
+				ShipCollision();
 				RenderExplosions();
 				
 				lasttick[1] = tick[1];
@@ -60,6 +164,8 @@ public class game extends JPanel implements Runnable
 				
 				ProcessLasershots();
 				
+				roundtick++;
+				
 				lasttick[0] = tick[0];
 			}
 			
@@ -67,13 +173,9 @@ public class game extends JPanel implements Runnable
 			SleepDelay(1);
 		}
 	}
-
-	private void ExecuteGameEvent(int roundtick)
-	{
-		
-	}
+	*/
 	
- 	private void ProcessLasershots()
+  	private void ProcessLasershots()
 	{
 		for (int i = 0; i < gameobjects.size(); i++)
 		{
@@ -82,43 +184,103 @@ public class game extends JPanel implements Runnable
 			
 			lasershot ls = (lasershot)gameobjects.get(i);
 			
-			if (ls.GetFiredBy() == 0)
-				ls.move(gameobjects.get(i).GetX(), gameobjects.get(i).GetY() - 30);
-			if (ls.GetFiredBy() == 1)
-				ls.move(gameobjects.get(i).GetX(), gameobjects.get(i).GetY() + 30);
-				
-			if (ls.GetY() < 0 || ls.GetY() > 800)
+			if (ls.GetType() == 3)
 			{
-				gameobjects.remove(i);
-				continue;
+				ls.Persecution();
+				if (ls.ShouldBeDeleted())
+				{
+					gameobjects.remove(i);
+					continue;
+				}
 			}
 			
-			for (int j = 0; j < gameobjects.size(); j++)
-			{	
+		    double degrees = (double)gameobjects.get(i).GetAngle();
+		    
+		    if (ls.GetFiredBy() == 1 && ls.GetType() != 3)
+		    	degrees = degrees + 180;
+		    
+		    double radians = Math.toRadians(degrees);
+			double x = 30 * Math.cos(radians) + gameobjects.get(i).GetX();
+			double y = 30 * Math.sin(radians) + gameobjects.get(i).GetY();
+			
+			if (ls.GetType() == 3)
+			{
+				x = 5 * Math.cos(radians) + gameobjects.get(i).GetX();
+				y = 5 * Math.sin(radians) + gameobjects.get(i).GetY();
+			}
+			
+			ls.move((int)x, (int)y);
+				
+			if (ls.GetY() < 0 || ls.GetY() > 800)
+				gameobjects.remove(i);
+		}
+	}
+  	
+  	private void ShipCollision()
+  	{
+  		myship ms = (myship)gameobjects.get(1);
+  		
+  		for (int i = 0; i < gameobjects.size(); i++)
+  		{
+  			if (gameobjects.get(i).go_class == 4)
+  			{
+  				enemyship es = (enemyship)gameobjects.get(i);
+  				
+  				if (DoGOsIntersect(ms, gameobjects.get(i)))
+  				{
+  					ms.ProcessDamage(10);
+  					es.SetHP(es.GetHP() - 15);
+  					
+  					int pos_x_exp = gameobjects.get(i).GetX() + gameobjects.get(i).img.getWidth(this) / 2 - 20;
+  					int pos_y_exp = gameobjects.get(i).GetY() + gameobjects.get(i).img.getHeight(this) / 2 - 20;
+  					
+  					explosion exp = new explosion(pos_x_exp, pos_y_exp, 90);
+  					exp.SetAnimationstage(2);
+  					gameobjects.add(exp);
+  					
+  					ManageDestruction();
+  				}
+  			}
+  		}
+  	}
+ 	
+ 	private void HitRegistration()
+ 	{	
+ 		for (int i = 0; i < gameobjects.size(); i++)
+ 		{
+			if (gameobjects.get(i).go_class != 3)
+				continue;
+			
+			lasershot ls = (lasershot)gameobjects.get(i);
+ 			
+ 			for (int j = 0; j < gameobjects.size(); j++)
+ 			{
 				if (gameobjects.get(j).go_class != 2 && gameobjects.get(j).go_class != 4)
 					continue;
 				
-				if (DoGOsIntersect(gameobjects.get(i), gameobjects.get(j)))
-				{					
-					if (gameobjects.get(j).go_class == 2 && ls.GetFiredBy() == 1)
-					{
-						myship ms = (myship)gameobjects.get(j);
-						ms.SetHP(ms.GetHP() - ls.GetDamage());
-					}
-						
-					else if (gameobjects.get(j).go_class == 4 && ls.GetFiredBy() == 0)
-					{
-						enemyship es = (enemyship)gameobjects.get(j);
-						es.SetHP(es.GetHP() - ls.GetDamage());
-					}
-					
-					gameobjects.remove(i);
-						
-					ManageDestruction();
-				}
-			}
-		}
-	}
+ 				if (DoGOsIntersect(gameobjects.get(i), gameobjects.get(j)))
+ 				{					
+ 					if (gameobjects.get(j).go_class == 2 && ls.GetFiredBy() == 1)
+ 					{
+ 						myship ms = (myship)gameobjects.get(j);
+ 						ms.ProcessDamage(15);
+ 							
+ 						ManageDestruction();
+ 						gameobjects.remove(i); break;
+ 					}
+ 							
+ 					else if (gameobjects.get(j).go_class == 4 && ls.GetFiredBy() == 0)
+ 					{
+ 						enemyship es = (enemyship)gameobjects.get(j);
+ 						es.SetHP(es.GetHP() - ls.GetDamage());
+ 							
+ 						ManageDestruction();
+ 						gameobjects.remove(i); break;
+ 					}
+ 				}
+ 			}
+ 		}
+ 	}
 	
 	private void ManageDestruction()
 	{
@@ -136,13 +298,13 @@ public class game extends JPanel implements Runnable
 				}
 			}
 			
-			if (gameobjects.get(i).go_class == 4)
+			else if (gameobjects.get(i).go_class == 4)
 			{
 				enemyship es = (enemyship)gameobjects.get(i);
 				if (es.GetHP() <= 0)
-				{
-					gameobjects.add(new explosion(pos_x, pos_y, 90));
+				{		
 					gameobjects.remove(i);
+					gameobjects.add(new explosion(pos_x, pos_y, 90));
 				}
 			}
 		}
@@ -156,7 +318,7 @@ public class game extends JPanel implements Runnable
 			{
 				explosion exp = (explosion)gameobjects.get(i);
 				
-				if (exp.GetAnimationstage() == 2)
+				if (exp.GetAnimationstage() == 3)
 					gameobjects.remove(i);
 				
 				exp.Animate();
@@ -184,7 +346,7 @@ public class game extends JPanel implements Runnable
 					
 					if (r_go1.contains(p) && r_go2.contains(p))
 					{
-						if (images.isPixelTransperent(go1, p.x, p.y) && images.isPixelTransperent(go2, p.x, p.y))
+						if (!images.isPixelTransperent(go1, p.x, p.y) && !images.isPixelTransperent(go2, p.x, p.y))
 							return true;
 					}
 				}
@@ -194,14 +356,34 @@ public class game extends JPanel implements Runnable
 		return false;
 	}
 	
+	public int GetGamestate()
+	{
+		return gamestate;
+	}
+	
+	public void SetGamestate(int i)
+	{
+		gamestate = i;
+	}
+	
 	public void AddObject(gameobject go)
 	{
 		gameobjects.add(go);
 	}
 	
+	public void RemoveObject(int idx)
+	{
+		gameobjects.remove(idx);
+	}
+	
 	public gameobject GetObject(int idx)
 	{
 		return gameobjects.get(idx);
+	}
+	
+	public ArrayList<gameobject> GetGOList()
+	{
+		return gameobjects;
 	}
 	
 	public static void SleepDelay(long milliseconds)
@@ -240,19 +422,16 @@ public class game extends JPanel implements Runnable
 	{
 		super.paintComponent(g);
 		
-		for (int i2 = 0; i2 <= 2; i2++)
+		for (int i2 = 0; i2 <= 3; i2++)
 		{
 			for (int i = 0; i < gameobjects.size(); i++)
 			{
-				if (gameobjects.get(i).layer == i2)
-				{
-					g.drawImage(gameobjects.get(i).img, gameobjects.get(i).GetX(), gameobjects.get(i).GetY(), null);
-				}
+				g.drawImage(gameobjects.get(i).img, gameobjects.get(i).GetX(), gameobjects.get(i).GetY(), null);
 			}
 		}
 		
-		if (gameobjects.size() > 0)
-		{
+		if (gameobjects.size() > 0 && gamestate == 1)
+		{	
 			myship ms = (myship)gameobjects.get(1);
 			
 			g.drawRect(100, 720, 350, 5);							// Ship Stats Outline

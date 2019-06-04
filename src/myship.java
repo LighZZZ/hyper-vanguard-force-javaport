@@ -5,7 +5,7 @@ public class myship extends gameobject
 {	
 	private int hp = 100;
 	private int sp = 100;
-	private int damage = 20;
+	private int damage = 10;
 	private boolean shieldactivated = true;
 	private Images images = new Images();
 	private game g = new game();
@@ -13,12 +13,12 @@ public class myship extends gameobject
 	public myship(int x, int y, double r_angle) 
 	{
 		super(x, y, r_angle);
-		Init(r_angle);
-		layer = 1;
+		Init();
+		layer = 2;
 		go_class = 2;
 	}
 
-	private void Init(double r_angle)
+	protected void Init()
 	{
 		int xywh_spaceship[] = {943, 0, 60, 60};
 		img = Images.GetImage("res/SCShmup_texture_3.png", 140, r_angle, xywh_spaceship);
@@ -82,7 +82,7 @@ public class myship extends gameobject
 	public void ShootMainlaser()
 	{
 		int randomspread = new SplittableRandom().nextInt(-3, 3);
-		lasershot ls = new lasershot(pos_x + (36 + randomspread), pos_y, 270);
+		lasershot ls = new lasershot(0, pos_x + (36 + randomspread), pos_y, 270);
 		ls.SetFiredBy(0);
 		ls.SetDamage(damage);
 		g.AddObject(ls);
@@ -111,5 +111,25 @@ public class myship extends gameobject
 	public boolean IsShieldActivated()
 	{
 		return shieldactivated;
+	}
+	
+	public void ProcessDamage(int dmg)
+	{
+		if (shieldactivated == true)
+		{
+			sp = sp - dmg;
+			if (sp < 0)
+				sp = 0;
+		}
+		else
+		{
+			hp = hp - dmg;
+			if (hp < 0)
+				hp = 0;
+		}
+		
+		
+		if (sp > 0 && hp <= 0)
+			sp = 0;
 	}
 }

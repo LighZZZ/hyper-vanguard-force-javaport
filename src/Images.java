@@ -18,10 +18,6 @@ import sun.awt.image.ToolkitImage;
 
 public class Images extends JPanel
 {
-	////////////////////////////////////////////////////////////////
-	//////////// Publicly accessable functions /////////////////////
-	////////////////////////////////////////////////////////////////
-	
     public Images() {}
 
 	public static Image GetImage(String imgpath, int sizepercentage, double r_angle, int xywh[])
@@ -36,8 +32,18 @@ public class Images extends JPanel
 		return img;
     }
 	
+	public static Image GetImage(Image img, int sizepercentage, double r_angle, int xywh[])
+    {
+		final Images imgs = new Images();
+		
+		img = imgs.ResizePicture(img, sizepercentage);
+		img = imgs.RotatePicture(img, r_angle);
+		
+		return img;
+    }
+	
     public Image MergePictures(Image img1, Image img2, int img2_pos_x, int img2_pos_y) //https://stackoverflow.com/questions/2318020/merging-two-images
-    {	
+    {		
     	int w = Math.max(img1.getWidth(this), img2.getWidth(this));
     	int h = Math.max(img1.getHeight(this), img2.getHeight(this));
     	
@@ -87,28 +93,43 @@ public class Images extends JPanel
     }
     
 	public boolean isPixelTransperent(gameobject go1, int pos_x, int pos_y)
-	{
+	{	
 		Image im = go1.img;
-        BufferedImage bi = new BufferedImage(im.getWidth(null),im.getHeight(null),BufferedImage.TYPE_INT_RGB);
+		
+        BufferedImage bi = new BufferedImage(im.getWidth(null), im.getHeight(null), BufferedImage.TYPE_INT_RGB);
         Graphics bg = bi.getGraphics();
         bg.drawImage(im, 0, 0, null);
         bg.dispose();
-		
+        
 		int x = pos_x - go1.GetX();
 		int y = pos_y - go1.GetY();
 		
 		int pixel = bi.getRGB(x, y);
-		int transperency = ((pixel >> 24) & 0xFF);
 		
-		if (transperency == 255)
-			return true;
+		  if((pixel >> 24) == 0x00)
+			  return true;
 		
 		return false;
 	}
-    
-	////////////////////////////////////////////////////////////////
-	//////////// Main picture functions ////////////////////////////
-	////////////////////////////////////////////////////////////////
+	
+    public Image RotatePicture(Image img, double r_angle) //https://stackoverflow.com/questions/4156518/rotate-an-image-in-java
+    {
+    	double angle = Math.toRadians(r_angle);
+    	
+        double sin = Math.abs(Math.sin(angle)), cos = Math.abs(Math.cos(angle));
+        int w = img.getWidth(this), h = img.getHeight(this);
+        int neww = (int)Math.floor(w*cos+h*sin), newh = (int) Math.floor(h * cos + w * sin);
+        
+        GraphicsConfiguration gc = getDefaultConfiguration();
+        BufferedImage result = gc.createCompatibleImage(neww, newh, Transparency.TRANSLUCENT);
+        Graphics2D g = result.createGraphics();
+        g.translate((neww - w) / 2, (newh - h) / 2);
+        g.rotate(angle, w / 2, h / 2);
+        g.drawImage(img, 0, 0, null);
+        g.dispose();
+        
+        return result;
+    }
    
     private Image ResizePicture(Image img, int sizepercentage)	//https://www.rgagnon.com/javadetails/java-0243.html
     {
@@ -131,26 +152,6 @@ public class Images extends JPanel
         
         return result;
     }
-    
-    private Image RotatePicture(Image img, double r_angle) //https://stackoverflow.com/questions/4156518/rotate-an-image-in-java
-    {
-    	BufferedImage bufimg = toBufferedImage(img);
-    	double angle = Math.toRadians(r_angle);
-    	
-        double sin = Math.abs(Math.sin(angle)), cos = Math.abs(Math.cos(angle));
-        int w = bufimg.getWidth(), h = bufimg.getHeight();
-        int neww = (int)Math.floor(w*cos+h*sin), newh = (int) Math.floor(h * cos + w * sin);
-        
-        GraphicsConfiguration gc = getDefaultConfiguration();
-        BufferedImage result = gc.createCompatibleImage(neww, newh, Transparency.TRANSLUCENT);
-        Graphics2D g = result.createGraphics();
-        g.translate((neww - w) / 2, (newh - h) / 2);
-        g.rotate(angle, w / 2, h / 2);
-        g.drawRenderedImage(bufimg, null);
-        g.dispose();
-        
-        return result;
-    }
 
 	private Image LoadPicture(String imgpath, int xywh[])
 	{
@@ -168,10 +169,6 @@ public class Images extends JPanel
     	
     	return SmallImg;
     }
-	
-	////////////////////////////////////////////////////////////////
-	//////////// Backend Functions /////////////////////////////////
-	////////////////////////////////////////////////////////////////
     
 	private static BufferedImage toBufferedImage(Image img) //https://stackoverflow.com/questions/13605248/java-converting-image-to-bufferedimage
 	{

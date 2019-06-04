@@ -5,6 +5,7 @@ public class enemyship extends gameobject
 	protected int hp = 100;
 	protected boolean isfiring = false;
 	protected boolean canfire = false;
+	protected int es_class = 0;
 	
 	public enemyship(int x, int y, double r_angle) 
 	{
